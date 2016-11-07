@@ -1,0 +1,29 @@
+{
+  "name": "Node-HW4",
+  "version": "1.0.0",
+  "description": "Hometasks for Geekbrains",
+  "main": "newspaper.js",
+  "scripts": {
+    "start": "node newspaper.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/babib2/Node-HW4.git"
+  },
+  "author": "babib2",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/babib2/Node-HW4/issues"
+  },
+  "homepage": "https://github.com/babib2/Node-HW4/#readme",
+   "dependencies": {
+    "express": "*",
+    "consolidate": "*",
+    "handlebars": "*",
+    "body-parser": "*",
+    "request": "*",
+    "cheerio": "*"
+  }
+}
+

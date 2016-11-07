@@ -1,0 +1,18 @@
+ <!DOCTYPE html>
+ <html lang="ru-RU">
+    <head>
+    </head>
+    <body>
+    
+    	<h1> Выберите категорию </h1>
+        <form action="/category/" method="post">
+            <select name="title">
+                {{#each category}}
+                   <option value="{{category}}">{{category}}</option>
+                {{/each}}
+            </select>
+            <button>Отправить</button>
+        </form>
+            
+    </body>
+</html>
