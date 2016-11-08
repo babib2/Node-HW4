@@ -23,31 +23,57 @@ app.get('/', function(req, res){
 });
 app.post('/news/', function(req, res){
 	var category= [];
+		if(req.body.serves == 'habra'){	
+			request('https://habrahabr.ru/', function (error, response, html) {
 
-	request('https://habrahabr.ru/', function (error, response, html) {
+				if (!error && response.statusCode == 200) {
+					
+					var $ = cheerio.load(html);
+					 $('.tabs-menu_habrahabr li').each(function(i, element){
+							var attr = {};
+							attr.category = $(element).find('span').text().trim();
+							attr.href = $(element).find('a').attr('href');
+							// console.log(attr.category);
+							// console.log(attr.href);
+							category.push(attr);
+						 });
+					
+					 //console.log(category);
 
-		if (!error && response.statusCode == 200) {
-			
-			var $ = cheerio.load(html);
-			 $('.tabs-menu_habrahabr li').each(function(i, element){
-					var attr = {};
-					attr.category = $(element).find('span').text().trim();
-					attr.href = $(element).find('a').attr('href');
-					// console.log(attr.category);
-					// console.log(attr.href);
-					category.push(attr);
-				 });
-			
-			 //console.log(category);
+					res.render('news', {
+						category: category,
 
-			res.render('news', {
-				category: category,
+					});		
+				}
 
-			});		
+
+			});	
 		}
+		if(req.body.serves == 'yandex'){
+			console.log('yandex');	
+			request('https://news.yandex.ru/', function (error, response, html) {
+			console.log('news yandex');
+				if (!error && response.statusCode == 200) {
+			console.log('200 OK');		
+					var $ = cheerio.load(html);
+					 $('.nav-by-rubrics_theme_nav-gray > .tabs-menu > li').each(function(i, element){
+							var attr = {};
+							attr.category = $(element).find('a').text().trim();
+							attr.href = $(element).find('a').attr('href');
+							console.log(attr.category);
+							console.log(attr.href);
+							category.push(attr);	
+						 });
+					console.log("asd");		
+					 //console.log(category);
 
+					res.render('news', {
+						category: category,
 
-	});	
+					});		
+				}
+			});
+		}
 
 });
 
