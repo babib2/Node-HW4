@@ -7,6 +7,10 @@ var templating = require('consolidate').handlebars;
 var bodyParser = require('body-parser');
 var request = require('request');
 var cheerio = require('cheerio');
+var yandexParser = require('./yandex');
+var habraParser = require('./habra');
+
+
 
 // выбираем функцию шаблонизации для hbs
 app.engine('hbs', templating);
@@ -22,104 +26,77 @@ app.get('/', function(req, res){
 	res.render('hello');
 });
 app.post('/news/', function(req, res){
-	var category= [];
+
 		if(req.body.serves == 'habra'){	
-			request('https://habrahabr.ru/', function (error, response, html) {
-
-				if (!error && response.statusCode == 200) {
-					
-					var $ = cheerio.load(html);
-					 $('.tabs-menu_habrahabr li').each(function(i, element){
-							var attr = {};
-							attr.category = $(element).find('span').text().trim();
-							attr.href = $(element).find('a').attr('href');
-							// console.log(attr.category);
-							// console.log(attr.href);
-							category.push(attr);
-						 });
-					
-					 //console.log(category);
-
-					res.render('news', {
-						category: category,
-
-					});		
-				}
-
-
-			});	
+			res.render('news', {
+						category: habraParser.category,
+						link: 'habra',
+					});	
 		}
 		if(req.body.serves == 'yandex'){
-			console.log('yandex');	
-			request('https://news.yandex.ru/', function (error, response, html) {
-			console.log('news yandex');
-				if (!error && response.statusCode == 200) {
-			console.log('200 OK');		
-					var $ = cheerio.load(html);
-					 $('.nav-by-rubrics_theme_nav-gray > .tabs-menu > li').each(function(i, element){
-							var attr = {};
-							attr.category = $(element).find('a').text().trim();
-							attr.href = $(element).find('a').attr('href');
-							console.log(attr.category);
-							console.log(attr.href);
-							category.push(attr);	
-						 });
-					console.log("asd");		
-					 //console.log(category);
-
-					res.render('news', {
-						category: category,
-
-					});		
-				}
-			});
+			res.render('news', {
+						category: yandexParser.category,
+						link: 'yandex',
+					});	
 		}
 
 });
 
 app.post('/category/', function(req, res){
-		var category= [];
-		var uri;
-		var url;
-		
-		
-		if(req.body.title == 'Лучшие'){
-			uri = 'top/';		
-		}
-		if(req.body.title == 'Интересные'){
-			uri = 'interesting/';	 
-		}else{
-			uri = 'all/';
+	var category= [];
+		if(req.body.serves == 'habra'){	
+			
+
+			 request(req.body.title, function (error, response, html) {
+				if (!error && response.statusCode == 200) {
+
+					var $ = cheerio.load(html);
 					
-		} 	
-		url = 'https://habrahabr.ru/'+ uri;
+					$(".post_teaser").each(function(i, element){
 
-		 request(url, function (error, response, html) {
-			if (!error && response.statusCode == 200) {
+						var attr = {};
+						attr.title= $(element).find('.post__title').text().trim();
+						attr.text = $(element).find('.content').text().trim();
+								
+						category.push(attr);
+					 });		
+					 							
+				}
+										
 
-				var $ = cheerio.load(html);
-				
-				$(".post_teaser").each(function(i, element){
+				res.render('category', {
+					news: category,
 
-					var attr = {};
-					attr.title= $(element).find('.post__title').text().trim();
-					attr.text = $(element).find('.content').text().trim();
-							
-					category.push(attr);
-				 });		
-				 							
-			}
-									
-
-			res.render('category', {
-				news: category,
-
+				});	
 			});	
-		});	
+		}
+		if(req.body.serves == 'yandex'){
+			request('https://news.yandex.ru' + req.body.title, function (error, response, html) {
+				if (!error && response.statusCode == 200) {
+
+					var $ = cheerio.load(html);
+					$('.rubric__right .story__content').each(function(i, element){
+						var attr = {};
+						attr.title = $(element).find('.story__title > a').text().trim();
+						attr.text = $(element).find('.story__text').text();
+						// console.log(attr.category);
+						// console.log(attr.href);
+						category.push(attr);
+						console.log(category);
+					 });	
+				}
+					res.render('category', {
+							news: category,
+					});	
+			});	
+		}
+		
+
+		
 });
 
 
-app.listen(8070, function(){
+app.listen(8080, function(){
 	console.log("Server start");
 
 })

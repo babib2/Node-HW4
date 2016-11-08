@@ -8,9 +8,10 @@
         <form action="/category/" method="post">
             <select name="title">
                 {{#each category}}
-                   <option value="{{category}}">{{category}}</option>
+                   <option value="{{href}}">{{category}}</option>
                 {{/each}}
             </select>
+            <input type="text" hidden="hidden" name="serves" value="{{link}}">
             <button>Отправить</button>
         </form>
             
